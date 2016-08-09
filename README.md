@@ -95,7 +95,7 @@ for hit in res['hits']['hits']:
 234,李明
 345,李念
 ```
-接下来我们索引这些数据，指定index名字为user_info, doc_type为basic, 代表用户的基本信息。代码如下：
+接下来我们索引这些数据，指定index名字为user_info, doc_type为basic, 代表用户的基本信息。代码(src/index.py)如下：
 
 
 ```python
@@ -110,7 +110,7 @@ doc = {
 }
 
 id = 0
-file = open('/Users/frank/Documents/workspace/algo/search_system_example/dataset/data.csv')
+file = open('/dataset/data.csv')
 lines = file.readlines()
 for line in lines:
     shard = line.strip('\n').split(',')
@@ -137,6 +137,7 @@ print(res['_source'])
     {u'user_id': u'123', u'user_name': u'\u5c0f\u7c73', u'timestamp': u'2016-08-09T21:30:17.860371'}
 
 ```python
+# 检索
 res = es.search(index="user_info", body={"query": {"match_all": {}}})
 print("Got %d Hits:" % res['hits']['total'])
 for hit in res['hits']['hits']:
@@ -149,3 +150,4 @@ Got 3 Hits:
 2016-08-09T21:30:17.860371 123: 小米
 2016-08-09T21:30:17.860371 345: 李念
 ```
+到目前为止，我们的数据检索系统完成了，真的是非常的简单，elasticsearch Schema Free的特性在这里得到了很好的体现，无论你的数据是在本地文件还是在DB， 你只需要重写数据解析和存储的模块就可以了。
