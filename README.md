@@ -153,7 +153,7 @@ Got 3 Hits:
 ```
 到目前为止，我们的数据检索系统完成了，真的是非常的简单，elasticsearch Schema Free的特性在这里得到了很好的体现，无论你的数据是在本地文件还是在DB， 你只需要重写数据解析和索引模块就可以了。
 
-## 第三步 提供一个web借口
+## 第三步 提供一个web接口
 试试把这个地址复制到浏览器地址栏中执行：
 ```
 http://localhost:9200/user_info/basic/_search?q=user_id:345
