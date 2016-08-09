@@ -122,10 +122,11 @@ for line in lines:
     print(res['created']), id, ' doc(s) indexed.'
 ```
 输出：  
+```
     True 1  doc(s) indexed.  
     True 2  doc(s) indexed.  
     True 3  doc(s) indexed.  
-
+```
 
 
 ```python
@@ -150,4 +151,39 @@ Got 3 Hits:
 2016-08-09T21:30:17.860371 123: 小米
 2016-08-09T21:30:17.860371 345: 李念
 ```
-到目前为止，我们的数据检索系统完成了，真的是非常的简单，elasticsearch Schema Free的特性在这里得到了很好的体现，无论你的数据是在本地文件还是在DB， 你只需要重写数据解析和存储的模块就可以了。
+到目前为止，我们的数据检索系统完成了，真的是非常的简单，elasticsearch Schema Free的特性在这里得到了很好的体现，无论你的数据是在本地文件还是在DB， 你只需要重写数据解析和索引模块就可以了。
+
+## 第三步 提供一个web借口
+试试把这个地址复制到浏览器地址栏中执行：
+```
+http://localhost:9200/user_info/basic/_search?q=user_id:345
+```
+没错，这个就是检索user_id = 345的用户基本信息，在浏览器中返回：
+```json
+{
+    "took": 6,
+    "timed_out": false,
+    "_shards": {
+        "total": 5,
+        "successful": 5,
+        "failed": 0
+    },
+    "hits": {
+        "total": 1,
+        "max_score": 0.30685282,
+        "hits": [
+            {
+                "_index": "user_info",
+                "_type": "basic",
+                "_id": "3",
+                "_score": 0.30685282,
+                "_source": {
+                    "user_name": "李念",
+                    "user_id": "345",
+                    "timestamp": "2016-08-09T21:30:17.860371"
+                }
+            }
+        ]
+    }
+}
+```
