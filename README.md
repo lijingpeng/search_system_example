@@ -1,7 +1,8 @@
 # search_system_example
 快速搭建一个搜索引擎，示例程序
 
-有时候你可能有这样的小需求，短时间内快速搭建一个规模不大的搜索引擎，并提供一个简单的界面给同事或者小部分人使用，这篇文章旨在介绍搭建一个简单搜索引擎的步骤，并力求做到：  
+有时候你可能有这样的小需求，短时间内快速搭建一个规模不大的搜索引擎，并提供一个简单的界面给同事或者小部分人使用，这篇文章旨在介绍搭建一个简单搜索引擎的步骤，并力求做到：
+
 1. 搜索引擎和数据分离，搜索引擎不应该依赖于数据存储和web接口  
 2. 可移植性要好，可以快速从本地机器迁移到服务器或者云端主机
 
@@ -47,3 +48,104 @@ docker run -d -p 9200:9200 -p 9300:9300 dockerfile/elasticsearch
 docker run -v ~/data:/usr/share/elasticsearch/data -p 9200:9200 -p 9300:9300 -d docker/elasticsearch
 ```
 截止到目前，我们的引擎已经搭建好了，该引擎将数据存储到我们指定的位置，实现了存储分离；提供了一个URL访问接口，不依赖具体的机器环境。下面一步就是准备待索引的数据，将数据索引起来以供检索。
+
+## 第二步 索引数据
+
+### 测试  
+在索引数据前我们先通过一个小例子测试下python接口，例子来自于[这里](https://elasticsearch-py.readthedocs.io/en/master/)
+
+```python
+from datetime import datetime
+from elasticsearch import Elasticsearch
+es = Elasticsearch() # 默认连接本地9200端口
+
+doc = {
+    'author': 'kimchy',
+    'text': 'Elasticsearch: cool. bonsai cool.',
+    'timestamp': datetime.now(),
+}
+# 索引数据
+res = es.index(index="test-index", doc_type='tweet', id=1, body=doc)
+```
+
+
+```python
+res = es.get(index="test-index", doc_type='tweet', id=1)
+print(res['_source'])
+```
+
+    {u'text': u'Elasticsearch: cool. bonsai cool.', u'author': u'kimchy', u'timestamp': u'2016-08-09T21:15:05.956257'}
+
+```python
+es.indices.refresh(index="test-index")
+
+res = es.search(index="test-index", body={"query": {"match_all": {}}})
+print("Got %d Hits:" % res['hits']['total'])
+for hit in res['hits']['hits']:
+    print("%(timestamp)s %(author)s: %(text)s" % hit["_source"])
+```
+
+    Got 1 Hits:
+    2016-08-09T21:15:05.956257 kimchy: Elasticsearch: cool. bonsai cool.
+
+### 索引数据
+假设数据是用户的信息数据，包括user_id和user_name, 存储在csv文件中，以逗号分隔，如下所示：
+```
+123,小米
+234,李明
+345,李念
+```
+接下来我们索引这些数据，指定index名字为user_info, doc_type为basic, 代表用户的基本信息。代码如下：
+
+
+```python
+from datetime import datetime
+from elasticsearch import Elasticsearch
+es = Elasticsearch()
+
+doc = {
+    'user_id': '',
+    'user_name': '',
+    'timestamp': datetime.now()
+}
+
+id = 0
+file = open('/Users/frank/Documents/workspace/algo/search_system_example/dataset/data.csv')
+lines = file.readlines()
+for line in lines:
+    shard = line.strip('\n').split(',')
+    id += 1
+    doc['user_id'] = shard[0]
+    doc['user_name'] = shard[1]
+
+    res = es.index(index="user_info", doc_type='basic', id=id, body=doc)
+    print(res['created']), id, ' doc(s) indexed.'
+```
+输出：  
+    True 1  doc(s) indexed.  
+    True 2  doc(s) indexed.  
+    True 3  doc(s) indexed.  
+
+
+
+```python
+res = es.get(index="user_info", doc_type='basic', id=1)
+print(res['_source'])
+```
+输出：  
+
+    {u'user_id': u'123', u'user_name': u'\u5c0f\u7c73', u'timestamp': u'2016-08-09T21:30:17.860371'}
+
+```python
+res = es.search(index="user_info", body={"query": {"match_all": {}}})
+print("Got %d Hits:" % res['hits']['total'])
+for hit in res['hits']['hits']:
+    print("%(timestamp)s %(user_id)s: %(user_name)s" % hit["_source"])
+```
+输出：  
+```
+Got 3 Hits:
+2016-08-09T21:30:17.860371 234: 李明
+2016-08-09T21:30:17.860371 123: 小米
+2016-08-09T21:30:17.860371 345: 李念
+```
