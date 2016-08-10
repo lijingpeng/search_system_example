@@ -154,6 +154,8 @@ Got 3 Hits:
 到目前为止，我们的数据检索系统完成了，真的是非常的简单，elasticsearch Schema Free的特性在这里得到了很好的体现，无论你的数据是在本地文件还是在DB， 你只需要重写数据解析和索引模块就可以了。
 
 ## 第三步 提供一个web接口
+
+### 浏览器测试
 试试把这个地址复制到浏览器地址栏中执行：
 ```
 http://localhost:9200/user_info/basic/_search?q=user_id:345
@@ -188,4 +190,6 @@ http://localhost:9200/user_info/basic/_search?q=user_id:345
 }
 ```
 
-接下来就可以编写web服务了，你可以使用任何你熟悉的web框架搭建一个友好的web访问界面，比如Spring MVC、或者是Flask。为了保持我们的接口足够简单，这里我们使用纯HTML+jQuery来搭建，不依赖任何web框架。不过我们先要解决ajax跨域访问的问题，万能的开源社区已经给我们提供了解决方案，我们需要在web工程里使用[elasticsearch.js](https://github.com/lijingpeng/search_system_example/tree/master/elasticsearch.js)
+### web访问界面
+接下来就可以编写web服务了，你可以使用任何你熟悉的web框架搭建一个友好的web访问界面，比如Spring MVC、或者是Flask。
+// todo
