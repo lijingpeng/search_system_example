@@ -1,5 +1,5 @@
 # search_system_example
-快速搭建一个搜索引擎，示例程序
+快速搭建一个搜索引擎，示例程序，地址：[https://github.com/lijingpeng/search_system_example](https://github.com/lijingpeng/search_system_example)
 
 有时候你可能有这样的小需求，短时间内快速搭建一个规模不大的搜索引擎，并提供一个简单的界面给同事或者小部分人使用，这篇文章旨在介绍搭建一个简单搜索引擎的步骤，并力求做到：
 
@@ -187,3 +187,5 @@ http://localhost:9200/user_info/basic/_search?q=user_id:345
     }
 }
 ```
+
+接下来就可以编写web服务了，你可以使用任何你熟悉的web框架搭建一个友好的web访问界面，比如Spring MVC、或者是Flask。为了保持我们的接口足够简单，这里我们使用纯HTML+jQuery来搭建，不依赖任何web框架。不过我们先要解决ajax跨域访问的问题，万能的开源社区已经给我们提供了解决方案，我们需要在web工程里使用[elasticsearch.js](https://github.com/lijingpeng/search_system_example/tree/master/elasticsearch.js)
